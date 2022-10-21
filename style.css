@@ -1,0 +1,82 @@
+body {
+  background-color: powderblue;
+
+  display: grid;
+}
+
+.insert-form {
+  justify-self: center;
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+
+  gap: 1rem;
+  margin: 3rem 0;
+
+  max-width: 500px;
+}
+
+.insert-form > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.insert-form input[type="submit"],
+.message {
+  grid-column: 1 / -1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.insert-form input {
+  padding: 0.2rem;
+}
+
+table {
+  border-collapse: collapse;
+  background-color: aliceblue;
+
+  margin: 0 2rem 2rem 2rem;
+}
+
+tr:nth-child(1) {
+  background-color: blueviolet;
+  color: white;
+}
+
+tr:not(:nth-child(1)):hover {
+  background-color: antiquewhite;
+}
+
+td,
+th {
+  border: 1px solid black;
+  padding: 1rem;
+}
+
+th > form {
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.5rem;
+}
+
+th > form > .buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.delete-btn {
+  text-align: center;
+}
+
+.delete-btn button {
+  border: 0;
+  background-color: inherit;
+  cursor: pointer;
+  color: crimson;
+}
