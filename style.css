@@ -4,6 +4,17 @@ body {
   display: grid;
 }
 
+.form {
+  justify-self: center;
+}
+
+.init-form {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+}
+
 .insert-form {
   justify-self: center;
 
@@ -16,7 +27,8 @@ body {
   max-width: 500px;
 }
 
-.insert-form > div {
+.insert-form > div,
+.init-form > div {
   display: flex;
   flex-direction: column;
 }
@@ -79,4 +91,24 @@ th > form > .buttons {
   background-color: inherit;
   cursor: pointer;
   color: crimson;
+}
+
+.btn {
+  padding: 0.3rem 1.5rem;
+  border: 1px solid black;
+  background-color: blueviolet;
+  color: white;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background-color: hsl(271, 76%, 43%);
+}
+
+fieldset {
+  border: 3px solid black;
+}
+
+legend {
+  font-weight: 1000;
 }
