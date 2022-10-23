@@ -1,5 +1,6 @@
 body {
   background-color: powderblue;
+  margin: 2rem;
 
   display: grid;
 }
@@ -49,8 +50,6 @@ body {
 table {
   border-collapse: collapse;
   background-color: aliceblue;
-
-  margin: 0 2rem 2rem 2rem;
 }
 
 tr:nth-child(1) {

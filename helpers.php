@@ -16,7 +16,7 @@ function mysqlTypeToHtml($mysqlType)
     } else if ($type == 'int') {
         return ['tag' => 'input', 'type' => 'number'];
     } else if ($type == 'datetime') {
-        return ['tag' => 'input', 'type' => 'date'];
+        return ['tag' => 'input', 'type' => 'datetime-local'];
     } else if ($type == 'text') {
         return ['tag' => 'textarea'];
     } else {
@@ -26,6 +26,11 @@ function mysqlTypeToHtml($mysqlType)
 
 function printTable($data)
 {
+    if (empty($data)) {
+        print("<p style='text-align: center'>Table is empty</p>");
+        return;
+    };
+
     if (count($data) > 0) {
         print("<table>");
 

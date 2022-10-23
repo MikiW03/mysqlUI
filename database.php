@@ -20,9 +20,26 @@
         $_SESSION['db_conn']['user'] = $_POST['user'];
         $_SESSION['db_conn']['password'] = $_POST['password'];
         $_SESSION['db_conn']['db'] = $_POST['db'];
-        $_SESSION['db_conn']['table'] = $_POST['table'];
     }
 
+    if (isset($_POST['table'])) {
+        $_SESSION['db_table'] = $_POST['table'];
+    }
+
+    if (isset($_SESSION['db_conn'])) {
+        $host =
+            $_SESSION['db_conn']['host'];
+        $user = $_SESSION['db_conn']['user'];
+        $password = $_SESSION['db_conn']['password'];
+        $db = $_SESSION['db_conn']['db'];
+
+        $conn = mysqli_connect($host, $user, $password, $db);
+        if (!mysqli_connect_errno()) {
+            // echo "Połączono z bazą danych";
+        } else {
+            die("Brak połączenia z bazą danych");
+        }
+    }
     ?>
 
     <form action="" method="POST" class="form">
@@ -44,30 +61,41 @@
                 <label for="db">database</label>
                 <input type="text" name="db" id="db" value="<?= $_SESSION['db_conn']['db'] ?? "" ?>">
             </div>
-            <div>
-                <label for="table">table</label>
-                <input type="text" name="table" id="table" value="<?= $_SESSION['db_conn']['table'] ?? "" ?>">
-            </div>
-            <input class="btn" type="submit" value="go">
+            <input class="btn" type="submit" value="Log in">
+
+            <?php
+            if (!empty($_SESSION['db_conn']) && !empty($conn)) {
+                $res = mysqli_query($conn, "SHOW TABLES");
+                $tablesAso = mysqli_fetch_all($res, MYSQLI_NUM);
+                $tables = array_merge(...$tablesAso);
+            ?>
+                <form action="" method="GET">
+                    <div>
+                        <label for="table">table</label>
+                        <select name="table" id="table" onchange='this.form.submit()'>
+
+                            <?php
+                            foreach ($tables as $tab) {
+                            ?>
+                                <option <?= !empty($_SESSION['db_table']) ? ($tab == $_SESSION['db_table'] ? "selected" : "") : "" ?> value="<?= $tab ?>"><?= $tab ?></option>
+                            <?php
+                            }
+                            ?>
+
+                        </select>
+                    </div>
+                    <noscript><input class="btn" type="submit" value="go"></noscript>
+                </form>
+            <?php
+            }
+            ?>
         </fieldset>
     </form>
 
     <?php
 
-    if (!empty($_SESSION['db_conn'])) {
-        $host =
-            $_SESSION['db_conn']['host'];
-        $user = $_SESSION['db_conn']['user'];
-        $password = $_SESSION['db_conn']['password'];
-        $db = $_SESSION['db_conn']['db'];
-        $table = $_SESSION['db_conn']['table'];
-
-        $conn = mysqli_connect($host, $user, $password, $db);
-        if (!mysqli_connect_errno()) {
-            // echo "Połączono z bazą danych";
-        } else {
-            die("Brak połączenia z bazą danych");
-        }
+    if (!empty($_SESSION['db_table']) && !empty($_SESSION['db_conn'])) {
+        $table = $_SESSION['db_table'];
 
         $res = mysqli_query($conn, "SHOW columns FROM $table");
         $columnsInfo = mysqli_fetch_all($res, MYSQLI_ASSOC);
@@ -82,10 +110,11 @@
             array_map(function ($col) {
                 return $col["Field"];
             }, $columnsInfoWithoutPrimary);
-        $primaryKey = array_filter($columnsInfo, function ($col) {
+        $primaryKeyArr = array_filter($columnsInfo, function ($col) {
             return $col["Key"] == "PRI";
-        })[0];
-        $primaryKeyField = $primaryKey['Field'];
+        });
+        $primaryKey = !empty($primaryKeyArr) ? reset($primaryKeyArr) : null;
+        $primaryKeyField = !empty($primaryKey) ? $primaryKey['Field'] : null;
 
     ?>
 
@@ -96,15 +125,7 @@
         }
 
 
-        if (isset($_POST['order'])) {
-            $orderPost = strip_tags($_POST['order']);
 
-            [$order, $ascDesc] = explode(" ", $orderPost, 2);
-            $res = mysqli_query($conn, "SELECT * FROM $table ORDER BY $order $ascDesc");
-        } else {
-            $res = mysqli_query($conn, "SELECT * FROM $table");
-        }
-        $rows = mysqli_fetch_all($res, MYSQLI_ASSOC);
 
         ?>
 
@@ -151,9 +172,7 @@
                 print(mysqli_stmt_get_result($stmt));
                 mysqli_stmt_execute($stmt);
 
-                if (!mysqli_stmt_errno($stmt)) {
-                    print("<p class='message'>Inserted succesfully</p>");
-                } else {
+                if (mysqli_stmt_errno($stmt)) {
                     print("<p class='message error'>Some error has occured</p>");
                 }
 
@@ -166,6 +185,17 @@
         </form>
 
         <?php
+
+        if (isset($_POST['order'])) {
+            $orderPost = strip_tags($_POST['order']);
+
+            [$order, $ascDesc] = explode(" ", $orderPost, 2);
+            $res = mysqli_query($conn, "SELECT * FROM $table ORDER BY $order $ascDesc");
+        } else {
+            $res = mysqli_query($conn, "SELECT * FROM $table");
+        }
+        $rows = mysqli_fetch_all($res, MYSQLI_ASSOC);
+
         printTable($rows);
         ?>
 </body>
