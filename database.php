@@ -13,6 +13,16 @@
     <?php
     require_once("helpers.php");
     session_start();
+    ?>
+    <form action="" method="POST">
+        <button class='btn' name='logout'>Log out</button>
+    </form>
+    <?php
+
+    if (isset($_POST['logout'])) {
+        session_destroy();
+        header("Refresh: 0");
+    }
 
     if (isset($_POST['host'])) {
         $_SESSION['db_conn'] = [];
@@ -73,6 +83,7 @@
                     <div>
                         <label for="table">table</label>
                         <select name="table" id="table" onchange='this.form.submit()'>
+                            <option selected disabled>SELECT YOUR TABLE</option>
 
                             <?php
                             foreach ($tables as $tab) {
