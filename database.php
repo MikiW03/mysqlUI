@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Document</title>
+    <title>MySQL UI</title>
 </head>
 
 <body>
@@ -30,6 +30,8 @@
         $_SESSION['db_conn']['user'] = $_POST['user'];
         $_SESSION['db_conn']['password'] = $_POST['password'];
         $_SESSION['db_conn']['db'] = $_POST['db'];
+
+        $_SESSION['db_table'] = null;
     }
 
     if (isset($_POST['table'])) {
@@ -73,35 +75,34 @@
             </div>
             <input class="btn" type="submit" value="Log in">
 
-            <?php
-            if (!empty($_SESSION['db_conn']) && !empty($conn)) {
-                $res = mysqli_query($conn, "SHOW TABLES");
-                $tablesAso = mysqli_fetch_all($res, MYSQLI_NUM);
-                $tables = array_merge(...$tablesAso);
-            ?>
-                <form action="" method="GET">
-                    <div>
-                        <label for="table">table</label>
-                        <select name="table" id="table" onchange='this.form.submit()'>
-                            <option selected disabled>SELECT YOUR TABLE</option>
-
-                            <?php
-                            foreach ($tables as $tab) {
-                            ?>
-                                <option <?= !empty($_SESSION['db_table']) ? ($tab == $_SESSION['db_table'] ? "selected" : "") : "" ?> value="<?= $tab ?>"><?= $tab ?></option>
-                            <?php
-                            }
-                            ?>
-
-                        </select>
-                    </div>
-                    <noscript><input class="btn" type="submit" value="go"></noscript>
-                </form>
-            <?php
-            }
-            ?>
         </fieldset>
     </form>
+
+    <?php
+    if (!empty($_SESSION['db_conn']) && !empty($conn)) {
+        $res = mysqli_query($conn, "SHOW TABLES");
+        $tablesAso = mysqli_fetch_all($res, MYSQLI_NUM);
+        $tables = array_merge(...$tablesAso);
+    ?>
+        <form action="" method="POST" class="table-form">
+            <label for="table">table</label>
+            <select name="table" id="table" onchange='this.form.submit()'>
+                <option selected disabled>SELECT YOUR TABLE</option>
+
+                <?php
+                foreach ($tables as $tab) {
+                ?>
+                    <option <?= !empty($_SESSION['db_table']) ? ($tab == $_SESSION['db_table'] ? "selected" : "") : "" ?> value="<?= $tab ?>"><?= $tab ?></option>
+                <?php
+                }
+                ?>
+
+            </select>
+            <noscript><input class="btn" type="submit" value="go"></noscript>
+        </form>
+    <?php
+    }
+    ?>
 
     <?php
 
@@ -149,7 +150,6 @@
                     <div>
                         <label for="<?= $col['Field'] ?>"><?= $col['Field'] ?></label>
                         <?php
-
                         if ($type['tag'] == "input") {
                         ?>
                             <input type="<?= $type['type'] ?>" name="<?= $col['Field'] ?>" id="<?= $col['Field'] ?>" required>
